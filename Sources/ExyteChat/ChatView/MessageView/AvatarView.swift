@@ -8,6 +8,11 @@ public struct AvatarView: View {
     let url: URL?
     let avatarSize: CGFloat
 
+    public init(url: URL?, avatarSize: CGFloat) {
+        self.url = url
+        self.avatarSize = avatarSize
+    }
+
     public var body: some View {
         CachedAsyncImage(url: url, urlCache: .imageCache) { image in
             image
