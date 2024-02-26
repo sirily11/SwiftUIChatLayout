@@ -4,12 +4,11 @@
 
 import SwiftUI
 
-struct AvatarView: View {
-
+public struct AvatarView: View {
     let url: URL?
     let avatarSize: CGFloat
 
-    var body: some View {
+    public var body: some View {
         CachedAsyncImage(url: url, urlCache: .imageCache) { image in
             image
                 .resizable()
