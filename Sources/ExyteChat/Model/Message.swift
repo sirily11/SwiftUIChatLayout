@@ -8,7 +8,6 @@
 import SwiftUI
 
 public struct Message: Identifiable, Hashable {
-
     public enum Status: Equatable, Hashable {
         case sending
         case sent
@@ -36,7 +35,7 @@ public struct Message: Identifiable, Hashable {
                 return true
             case (.read, .read):
                 return true
-            case ( .error(_), .error(_)):
+            case (.error(_), .error(_)):
                 return true
             default:
                 return false
@@ -53,6 +52,18 @@ public struct Message: Identifiable, Hashable {
     public var attachments: [Attachment]
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
+    public var rawData: (any Codable)?
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(user)
+        hasher.combine(status)
+        hasher.combine(createdAt)
+        hasher.combine(text)
+        hasher.combine(attachments)
+        hasher.combine(recording)
+        hasher.combine(replyMessage)
+    }
 
     public init(id: String,
                 user: User,
@@ -61,8 +72,9 @@ public struct Message: Identifiable, Hashable {
                 text: String = "",
                 attachments: [Attachment] = [],
                 recording: Recording? = nil,
-                replyMessage: ReplyMessage? = nil) {
-
+                replyMessage: ReplyMessage? = nil,
+                rawData: (any Codable)? = nil)
+    {
         self.id = id
         self.user = user
         self.status = status
@@ -71,31 +83,34 @@ public struct Message: Identifiable, Hashable {
         self.attachments = attachments
         self.recording = recording
         self.replyMessage = replyMessage
+        self.rawData = rawData
     }
 
     public static func makeMessage(
         id: String,
         user: User,
         status: Status? = nil,
-        draft: DraftMessage) async -> Message {
-            let attachments = await draft.medias.asyncCompactMap { media -> Attachment? in
-                guard let thumbnailURL = await media.getThumbnailURL() else {
-                    return nil
-                }
-
-                switch media.type {
-                case .image:
-                    return Attachment(id: UUID().uuidString, url: thumbnailURL, type: .image)
-                case .video:
-                    guard let fullURL = await media.getURL() else {
-                        return nil
-                    }
-                    return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
-                }
+        draft: DraftMessage,
+        rawData: (any Codable)? = nil
+    ) async -> Message {
+        let attachments = await draft.medias.asyncCompactMap { media -> Attachment? in
+            guard let thumbnailURL = await media.getThumbnailURL() else {
+                return nil
             }
 
-            return Message(id: id, user: user, status: status, createdAt: draft.createdAt, text: draft.text, attachments: attachments, recording: draft.recording, replyMessage: draft.replyMessage)
+            switch media.type {
+            case .image:
+                return Attachment(id: UUID().uuidString, url: thumbnailURL, type: .image)
+            case .video:
+                guard let fullURL = await media.getURL() else {
+                    return nil
+                }
+                return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
+            }
         }
+
+        return Message(id: id, user: user, status: status, createdAt: draft.createdAt, text: draft.text, attachments: attachments, recording: draft.recording, replyMessage: draft.replyMessage, rawData: rawData)
+    }
 }
 
 extension Message {
@@ -138,8 +153,8 @@ public struct ReplyMessage: Codable, Identifiable, Hashable {
                 user: User,
                 text: String = "",
                 attachments: [Attachment] = [],
-                recording: Recording? = nil) {
-
+                recording: Recording? = nil)
+    {
         self.id = id
         self.user = user
         self.text = text
@@ -153,7 +168,6 @@ public struct ReplyMessage: Codable, Identifiable, Hashable {
 }
 
 public extension Message {
-
     func toReplyMessage() -> ReplyMessage {
         ReplyMessage(id: id, user: user, text: text, attachments: attachments, recording: recording)
     }

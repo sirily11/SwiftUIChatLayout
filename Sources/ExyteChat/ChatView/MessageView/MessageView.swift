@@ -7,8 +7,7 @@
 
 import SwiftUI
 
-struct MessageView: View {
-
+public struct MessageView: View {
     @Environment(\.chatTheme) private var theme
 
     @ObservedObject var viewModel: ChatViewModel
@@ -47,10 +46,10 @@ struct MessageView: View {
         let timeWidth = timeSize.width + 10
         let textPaddings = MessageView.horizontalTextPadding * 2
         let widthWithoutMedia = UIScreen.main.bounds.width
-        - avatarViewSize.width
-        - statusSize.width
-        - MessageView.horizontalBubblePadding
-        - textPaddings
+            - avatarViewSize.width
+            - statusSize.width
+            - MessageView.horizontalBubblePadding
+            - textPaddings
 
         let maxWidth = message.attachments.isEmpty ? widthWithoutMedia : MessageView.widthWithMedia - textPaddings
         let finalWidth = message.text.width(withConstrainedWidth: maxWidth, font: font, messageUseMarkdown: messageUseMarkdown)
@@ -68,8 +67,8 @@ struct MessageView: View {
 
     var showAvatar: Bool {
         positionInGroup == .single
-        || (chatType == .chat && positionInGroup == .last)
-        || (chatType == .comments && positionInGroup == .first)
+            || (chatType == .chat && positionInGroup == .last)
+            || (chatType == .comments && positionInGroup == .first)
     }
 
     var topPadding: CGFloat {
@@ -82,7 +81,7 @@ struct MessageView: View {
         return positionInGroup == .single || positionInGroup == .first ? 8 : 4
     }
 
-    var body: some View {
+    public var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
             if !message.user.isCurrentUser {
                 avatarView
@@ -270,13 +269,11 @@ struct MessageView: View {
 }
 
 extension View {
-
     @ViewBuilder
     func bubbleBackground(_ message: Message, theme: ChatTheme, isReply: Bool = false) -> some View {
         let radius: CGFloat = !message.attachments.isEmpty ? 12 : 20
         let additionalMediaInset: CGFloat = message.attachments.count > 1 ? 2 : 0
-        self
-            .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia + additionalMediaInset)
+        frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia + additionalMediaInset)
             .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
             .background {
                 if isReply || !message.text.isEmpty || message.recording != nil {
@@ -294,10 +291,10 @@ struct MessageView_Preview: PreviewProvider {
     static let stan = User(id: "stan", name: "Stan", avatarURL: nil, isCurrentUser: false)
     static let john = User(id: "john", name: "John", avatarURL: nil, isCurrentUser: true)
 
-    static private var shortMessage = "Hi, buddy!"
-    static private var longMessage = "Hello hello hello hello hello hello hello hello hello hello hello hello hello\n hello hello hello hello d d d d d d d d"
+    private static var shortMessage = "Hi, buddy!"
+    private static var longMessage = "Hello hello hello hello hello hello hello hello hello hello hello hello hello\n hello hello hello hello d d d d d d d d"
 
-    static private var replyedMessage = Message(
+    private static var replyedMessage = Message(
         id: UUID().uuidString,
         user: stan,
         status: .read,
@@ -311,7 +308,7 @@ struct MessageView_Preview: PreviewProvider {
         ]
     )
 
-    static private var message = Message(
+    private static var message = Message(
         id: UUID().uuidString,
         user: stan,
         status: .read,

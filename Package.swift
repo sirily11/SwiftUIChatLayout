@@ -11,7 +11,8 @@ let package = Package(
     products: [
         .library(
             name: "ExyteChat",
-            targets: ["ExyteChat"]),
+            targets: ["ExyteChat"]
+        )
     ],
     dependencies: [
         .package(
@@ -29,7 +30,7 @@ let package = Package(
         .package(
             url: "https://github.com/exyte/ActivityIndicatorView",
             from: "1.0.0"
-        ),
+        )
     ],
     targets: [
         .target(
@@ -43,6 +44,10 @@ let package = Package(
         ),
         .testTarget(
             name: "ExyteChatTests",
-            dependencies: ["ExyteChat"]),
+            dependencies: ["ExyteChat"]
+        ),
+        .target(name: "Example",
+                dependencies: ["ExyteChat"],
+                path: "Example")
     ]
 )

@@ -2,30 +2,32 @@
 //  Created by Alex.M on 28.06.2022.
 //
 
+import ExyteChat
 import Foundation
 import SwiftUI
-import ExyteChat
 
 struct ChatExampleView: View {
-
     @StateObject private var viewModel: ChatExampleViewModel
-    
+
     private let title: String
 
     init(viewModel: ChatExampleViewModel = ChatExampleViewModel(), title: String) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.title = title
     }
-    
+
     var body: some View {
         ChatView(messages: viewModel.messages) { draft in
             viewModel.send(draft: draft)
         }
-//        messageBuilder: { message, _, _ in
-//            Text(message.text)
-//                .background(Color.green)
-//                .cornerRadius(10)
-//                .padding(10)
+//        messageBuilder: { message, _, defaultView, _ in
+//            Group {
+//                if let rawData = message.rawData as? String {
+//                    Text("haha")
+//                } else {
+//                    defaultView
+//                }
+//            }
 //        }
 //        inputViewBuilder: { textBinding, attachments, state, style, actionClosure in
 //            Group {
@@ -71,7 +73,10 @@ struct ChatExampleView: View {
                 fullscreenTint: .white
             )
         )
-        .onAppear(perform: viewModel.onStart)
+        .onAppear {
+            viewModel.onStart()
+            viewModel.messages.append(.init(id: "1", user: .init(id: "2", name: "", avatarURL: nil, isCurrentUser: true), rawData: "Hello"))
+        }
         .onDisappear(perform: viewModel.onStop)
     }
 }
